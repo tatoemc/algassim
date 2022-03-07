@@ -52,6 +52,9 @@ class PermissionTableSeeder extends Seeder
             'dept-create',
             'dept-edit',
             'dept-delete',
+
+            'report-list',
+            'report-show',
             
             'payment-list',
             'payment-create',

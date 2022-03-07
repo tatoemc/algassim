@@ -10,16 +10,19 @@
     <link href="{{ URL::asset('assets/css-rtl/bootstrap-datepicker.css') }}" rel="stylesheet">
 
 @endsection
+
 @section('title')
-      الكفالات
+      الايتام
 @stop
+
 @section('page-header')
     <!-- breadcrumb -->
     <div class="breadcrumb-header justify-content-between">
         <div class="my-auto">
             <div class="d-flex">
-                <h4 class="content-title mb-0 my-auto">الكفالات</h4><span class="text-muted mt-1 tx-13 mr-2 mb-0">/ كل
-                     الكفالات</span>
+                <h4 class="content-title mb-0 my-auto">اوليا الامور</h4><span class="text-muted mt-1 tx-13 mr-2 mb-0">/ 
+               العدد الكلي :  {{$sponsors->count()}} </span> 
+                    
             </div>
         </div>
         <div class="d-flex my-xl-auto right-content">
@@ -30,6 +33,27 @@
     <!-- breadcrumb -->
 @endsection
 @section('content')
+   @if (session()->has('add_orphan'))
+        <script>
+            window.onload = function() {
+                notif({
+                    msg: "تم أضافة اليتيم بنجاح",
+                    type: "success"
+                })
+            }
+        </script>
+    @endif
+    
+     @if (session()->has('delete_orphan'))
+        <script>
+            window.onload = function() {
+                notif({
+                    msg: "تم حذف اليتيم بنجاح",
+                    type: "success"
+                })
+            }
+        </script>
+    @endif
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -39,63 +63,39 @@
             </ul>
         </div>
     @endif
-     @if (session()->has('add_sponserform'))
-        <script>
-            window.onload = function() {
-                notif({
-                    msg: "تم أضافة الكفالة بنجاح",
-                    type: "success"
-                })
-            }
-        </script>
-    @endif
    
     <!-- row -->
     <div class="row">
         <div class="col-xl-12">
             <div class="card mg-b-20">
-                <div class="card-header pb-0">
-                    <div class="d-flex justify-content-between">
-                       <a href=" {{ route('sponserforms.create')}} " class="btn btn-lg btn-block btn-primary">أضافة كفالة</a>
-
-                    </div>
-                </div>
-                <div class="card-body">
+                 <div class="card-header pb-0"> 
+                 @if ($sponsors->count() > 0)
                     <div class="table-responsive">
+                  
                         <table id="example1" class="table key-buttons text-md-nowrap" data-page-length='50'>
                             <thead>
                                 <tr>
                                     <th class="border-bottom-0">#</th>
-                                     <th class="border-bottom-0">اليتيم</th>
-                                     <th class="border-bottom-0">المبلغ</th>
-                                    <th class="border-bottom-0">ولي الامر</th>
-                                    <th class="border-bottom-0">الكافل</th>
-                                     <th class="border-bottom-0">بداية الكفالة</th>
-                                    <th class="border-bottom-0"> نوع الكفالة </th>
-                                    <th class="border-bottom-0"> طريقة الدفع</th>
-                                    <th class="border-bottom-0">العمليات</th>
+                                    <th class="border-bottom-0">الاسم</th>
+                                    <th class="border-bottom-0">عدد الاطفال</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($sponserforms as $index => $sponserform)
+                                @foreach ($sponsors as $index => $sponsor)
+                                
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                         <td>{{ $sponserform->orphan->name }}</td>
-                                         <td>{{ $sponserform->amount }}</td>
-                                        <td>{{ $sponserform->orphan->user->name }}</td>
-                                        <td>{{$sponserform->guardians[0]->user->name}}</td>
-                                        <td>{{ date( 'M j Y', strtotime($sponserform->created_at)) }}</td>
-                                        <td>{{ $sponserform->kafal_type }}</td>
-                                        <td>{{ $sponserform->payment_type }} </td>
-                        
-                                        <td>
-                                          <a href="{{ route('sponserforms.show',$sponserform->id)}}" class="btn btn-primary btn-sm">عرض</a>  
-                                          <a href="{{ route('sponserforms.edit',$sponserform->id)}}" class="btn btn-primary btn-sm">تعديل</a>
-                                       </td>
+                                        <td>{{ $sponsor->user->name }}</td>
+                                        <td>{{ $sponsor->user->orphans->count() }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                    @endif
+                    
+                  </div>
+                <div class="card-body">
+               
                     </div>
                 </div>
             </div>
@@ -103,33 +103,7 @@
         <!-- End Basic modal -->
     </div>
     <!-- row closed -->
-    <div class="modal fade" id="modaldemo9" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">حذف اليتيم</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="orphans/destroy" method="post">
-                    {{ method_field('delete') }}
-                    {{ csrf_field() }}
-                    <div class="modal-body">
-                        <p>هل انت متاكد من عملية الحذف ؟</p><br>
-                        <input type="hidden" name="id" id="id" value="">
-                        <input class="form-control" name="name" id="name" type="text" readonly>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">الغاء</button>
-                        <button type="submit" class="btn btn-danger">تاكيد</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
+  
     </div>
     <!-- Container closed -->
     </div>
@@ -157,4 +131,5 @@
     <script src="{{ URL::asset('assets/js/table-data.js') }}"></script>
     <script src="{{ URL::asset('assets/js/modal.js') }}"></script>
     <script src="{{ URL::asset('assets/js/bootstrap-datepicker.js') }}"></script>
+
 @endsection

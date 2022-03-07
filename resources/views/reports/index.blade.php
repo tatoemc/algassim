@@ -12,15 +12,16 @@
 @endsection
 
 @section('title')
- الدفعيات
-@endsection
+      تقارير الايتام 
+@stop
+
 @section('page-header')
     <!-- breadcrumb -->
     <div class="breadcrumb-header justify-content-between">
         <div class="my-auto">
             <div class="d-flex">
-                <h4 class="content-title mb-0 my-auto">الدفعيات</h4><span class="text-muted mt-1 tx-13 mr-2 mb-0">/ كل
-                     الدفعيات</span>
+                <h4 class="content-title mb-0 my-auto">الايتام</h4><span class="text-muted mt-1 tx-13 mr-2 mb-0">/ كل
+                    الايتام</span>
             </div>
         </div>
         <div class="d-flex my-xl-auto right-content">
@@ -31,6 +32,27 @@
     <!-- breadcrumb -->
 @endsection
 @section('content')
+   @if (session()->has('add_orphan'))
+        <script>
+            window.onload = function() {
+                notif({
+                    msg: "تم أضافة اليتيم بنجاح",
+                    type: "success"
+                })
+            }
+        </script>
+    @endif
+    
+     @if (session()->has('delete_orphan'))
+        <script>
+            window.onload = function() {
+                notif({
+                    msg: "تم حذف اليتيم بنجاح",
+                    type: "success"
+                })
+            }
+        </script>
+    @endif
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul>
@@ -40,49 +62,68 @@
             </ul>
         </div>
     @endif
-     @if (session()->has('add_payment'))
-        <script>
-            window.onload = function() {
-                notif({
-                    msg: "تم تأكيد الدفعية بنجاح",
-                    type: "success"
-                })
-            }
-        </script>
-    @endif
+   
     <!-- row -->
     <div class="row">
         <div class="col-xl-12">
             <div class="card mg-b-20">
-                <div class="card-body">
+                 <div class="card-header pb-0">
+                        {!! Form::open(['route' => 'reports.index', 'method' => 'POST' ]) !!}
+                       {{csrf_field()}}
+                       {{ method_field('get') }}
+                
+                     <div class="col-lg-3 mg-t-20 mg-lg-t-0" id="type">
+                            <p class="mg-b-10">تحديد الايتام</p><select class="form-control select2" name="type">
+                                <option value="" selected>اختيار</option>
+                                <option value="0">الكل</option>
+                                <option value="1">الايتام المكفولين</option>
+                                <option value="2">الايتام الغير مكفولين</option>
+                            </select>
+                        </div><br>
+
+                        <div class="col-sm-1">
+                            {{ Form::submit('عرض', ['class'=>'btn btn-success btn-block'] )}}
+                        </div><br>
+                    </div>
+                {!! Form::close() !!}
+
+
+                 @if ($orphans->count() > 0)
                     <div class="table-responsive">
                         <table id="example1" class="table key-buttons text-md-nowrap" data-page-length='50'>
                             <thead>
                                 <tr>
                                     <th class="border-bottom-0">#</th>
-                                    <th class="border-bottom-0">اسم الكافل</th>
                                     <th class="border-bottom-0"> اسم اليتيم</th>
-                                     <th class="border-bottom-0">تاريخ الدفع</th>
+                                    <th class="border-bottom-0">ولي الامر</th>
+                                    <th class="border-bottom-0">النوع</th>
+                                    <th class="border-bottom-0">تاريخ الميلاد </th>
+                                    <th class="border-bottom-0">المرحلة الدراسية </th>
+                                    <th class="border-bottom-0">العنوان</th>
+                                    <th class="border-bottom-0">الرقم الوطني</th>
                                     <th class="border-bottom-0">الحالة</th>
+                                    <th class="border-bottom-0">العمليات</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($payments as $index => $payment)
+                                @foreach ($orphans as $index => $orphan)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                       
-                                        <td>{{ $payment->guardian->user->name }} </td>
-                                        <td>{{ $payment->orphan->name }}</td>
-                                         <td>{{ date( 'M j Y', strtotime($payment->created_at)) }}</td>
+                                        <td>{{ $orphan->name }}</td>
+                                        <td>{{ $orphan->user->name }} </td>
+                                        <td>{{ $orphan->gender }}</td>
+                                        <td>{{ $orphan->b_date }}</td>
+                                        <td>{{ $orphan->schoolLevel }}</td>
+                                        <td>{{ $orphan->add }}</td>
+                                        <td>{{ $orphan->ssn }}</td>
                                         <td>
-                                            @if ($payment->stauts == 0)
-                                                <span class="text-danger">لم يتم التأكيد</span>
-                                            @elseif($payment->stauts == 1)
-                                                <span class="text-success">تم التأكيد</span>
+                                            @if ($orphan->stauts == 0)
+                                                <span class="text-danger">غير مكفول</span>
+                                            @elseif($orphan->stauts == 1)
+                                                <span class="text-success">مكفول</span>
                                             @endif
-
-                                       
                                         </td>
+
                                         <td>
                                                 <div class="dropdown">
                                                     <button aria-expanded="false" aria-haspopup="true"
@@ -92,19 +133,25 @@
                                                     <div class="dropdown-menu tx-13">
 
                                                         <a class="dropdown-item"
-                                                            href=" {{ route('payments.edit', $payment->id) }}"><i
+                                                            href=" {{ route('orphans.edit', $orphan->id) }}"><i
                                                                 class="text-success fas fa-edit"></i>&nbsp;&nbsp;تعديل
                                                         </a>
 
                                                         <a class="dropdown-item"
-                                                            href=" {{ route('payments.show', $payment->id) }}"><i
+                                                            href=" {{ route('orphans.show', $orphan->id) }}"><i
                                                                 class="text-success fas fa-eye"></i>&nbsp;&nbsp;عرض
                                                         </a>
 
-                                                        <a class="dropdown-item" data-payment_id="{{ $payment->id }}"
-                                                            data-toggle="modal" data-target="#delete_payment"
-                                                            href="Print_payment/{{ $payment->id }}"><i
+                                                        <a class="dropdown-item" data-orphan_id="{{ $orphan->id }}"
+                                                            data-toggle="modal" data-target="#delete_orphan"
+                                                            href="Print_orphan/{{ $orphan->id }}"><i
                                                                 class="text-success fas fa-trash-alt"></i>&nbsp;&nbsp;حذف
+                                                            
+                                                        </a>
+
+                                                        <a class="dropdown-item"
+                                                            href="print_orphan/{{ $orphan->id }}"><i
+                                                                class="text-success fas fa-print"></i>&nbsp;&nbsp;طباعة
                                                             
                                                         </a>
                                                     </div>
@@ -113,6 +160,11 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    @endif
+                    
+                  </div>
+                <div class="card-body">
+               
                     </div>
                 </div>
             </div>
@@ -120,33 +172,7 @@
         <!-- End Basic modal -->
     </div>
     <!-- row closed -->
-    <div class="modal fade" id="modaldemo9" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">حذف اليتيم</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form action="orphans/destroy" method="post">
-                    {{ method_field('delete') }}
-                    {{ csrf_field() }}
-                    <div class="modal-body">
-                        <p>هل انت متاكد من عملية الحذف ؟</p><br>
-                        <input type="hidden" name="id" id="id" value="">
-                        <input class="form-control" name="name" id="name" type="text" readonly>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">الغاء</button>
-                        <button type="submit" class="btn btn-danger">تاكيد</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
+  
     </div>
     <!-- Container closed -->
     </div>
@@ -175,67 +201,4 @@
     <script src="{{ URL::asset('assets/js/modal.js') }}"></script>
     <script src="{{ URL::asset('assets/js/bootstrap-datepicker.js') }}"></script>
 
-
-    <script>
-        $('#edit_orphan').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget)
-            var id = button.data('id')
-            var name = button.data('name')
-            var gender = button.data('gender')
-            var b_date = button.data('b_date')
-
-            var add = button.data('add')
-            var ssn = button.data('ssn')
-            var helth_state = button.data('helth_state')
-            var father_deth = button.data('father_deth')
-            var brother_count = button.data('brother_count')
-            var death_certif = button.data('death_certif')
-            var images = button.data('images')
-
-            var modal = $(this)
-            modal.find('.modal-body #id').val(id);
-            modal.find('.modal-body #name').val(name);
-            modal.find('.modal-body #gender').val(gender);
-            modal.find('.modal-body #b_date').val(b_date);
-
-            modal.find('.modal-body #add').val(add);
-            modal.find('.modal-body #ssn').val(ssn);
-            modal.find('.modal-body #helth_state').val(helth_state);
-            modal.find('.modal-body #father_deth').val(father_deth);
-            modal.find('.modal-body #brother_count').val(brother_count);
-            modal.find('.modal-body #death_certif').val(death_certif);
-            modal.find('.modal-body #images').val(images);
-
-        })
-
-
-        $('#modaldemo9').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget)
-            var id = button.data('id')
-            var name = button.data('name')
-            var modal = $(this)
-
-            modal.find('.modal-body #id').val(id);
-            modal.find('.modal-body #name').val(name);
-        })
-    </script>
-
-    <script>
-        $(function() {
-            $('.dates #b_date').datepicker({
-                'format': 'yyyy-mm-dd',
-                'autoclose': true,
-                'multidate': true
-            });
-
-        });
-        $(function() {
-            $('.dates #father_deth').datepicker({
-                'format': 'yyyy-mm-dd',
-                'autoclose': true,
-                'multidate': true
-            });
-
-        });
-    </script>
 @endsection

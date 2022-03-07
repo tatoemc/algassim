@@ -24,6 +24,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::resource('orphans', 'OrphanController');
 Route::get('print_orphan/{id}','OrphanController@print_orphan');
+Route::get('report', 'OrphanController@report')->name('report');
 Route::get('download/{id}', 'OrphanController@get_file');
 //Route::get('download/{invoice_number}/{file_name}', 'InvoicesDetailsController@get_file');
 Route::resource('guardians', 'GuardianController');
@@ -36,6 +37,13 @@ Route::resource('sponserforms', 'SponserformController');
 Route::resource('payments', 'PaymentController');
 Route::get('getPayment','PaymentController@getPayment')->name('getPayment');
 Route::resource('depts', 'DeptController');
+Route::resource('students', 'StudentController');
+
+Route::resource('reports', 'ReportsController');
+Route::get('usereport', 'ReportsController@usereport')->name('usereport');
+Route::get('sponsorsreport', 'ReportsController@sponsorsreport')->name('sponsorsreport');
+//Route::get('reportsorphans', 'ReportsController@reportsorphans')->name('reportsorphans');
+
 
 Route::group(['middleware' => ['auth']], function() {
     

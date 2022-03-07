@@ -45,14 +45,8 @@ class HomeController extends Controller
           $guardian = Guardian::where('user_id',$user_id)
           ->with('user','sponserforms')
           ->first();
-         //get orphans
           $orphans = Orphan::where('user_id',$user_id)->get();
-          //get Payment
-         // $guardian = Guardian::where('user_id',Auth::user()->id)->first();
-         // $guardian_id = $guardian->id;
-         
-          //dd($payments);
-        
+
         return view('home',compact('guardian','orphans','persent1','persent2'));
     }
 }

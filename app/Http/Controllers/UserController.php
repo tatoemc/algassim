@@ -13,7 +13,7 @@ use Image;
 
 class UserController extends Controller
 {
-    /*
+    
     function __construct()
     {
 
@@ -23,7 +23,7 @@ class UserController extends Controller
       $this->middleware('permission:user-delete', ['only' => ['destroy']]);
 
     }
-    */
+    
     public function index(Request $request)
     {
         $data = User::orderBy('id','DESC')->paginate(5);

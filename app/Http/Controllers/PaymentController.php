@@ -30,9 +30,11 @@ class PaymentController extends Controller
     
     public function index()
     {
-        $orphans = Orphan::all(); 
 
-        return view ('orphans.index',compact('orphans'));
+        $payments = Payment::whereMonth('created_at',Carbon::now()->format('m'))
+        ->get();
+
+        return view ('payments.index',compact('payments'));
     }
 
    
@@ -85,8 +87,7 @@ class PaymentController extends Controller
     
     public function show(Payment $payment,Request $request)
     {
-        
-        dd($request->all());
+        return view ('payments.show',compact('payment'));
     }
     public function getPayment(Request $request)
     {
@@ -107,8 +108,22 @@ class PaymentController extends Controller
     
     public function update(UpdatePaymentRequest $request, Payment $payment)
     {
-        //
-    }
+        
+
+        $type = $request->type;
+
+        if($type == 1)
+        {
+
+            $payment->update([
+                'stauts' =>'1',
+            ]);
+            session()->flash('add_payment');
+            return redirect('/payments');
+        }
+        
+        dd($request->all());
+    }//end of update
 
     
     public function destroy(Payment $payment)

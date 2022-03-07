@@ -20,7 +20,6 @@ class SponserformController extends Controller
     
     function __construct()
      {
-
        $this->middleware('permission:sponserform-list', ['only' => ['index']]);
        $this->middleware('permission:sponserform-create', ['only' => ['create','store']]);
        $this->middleware('permission:sponserform-edit', ['only' => ['edit','update']]);

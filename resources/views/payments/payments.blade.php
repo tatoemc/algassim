@@ -57,6 +57,7 @@
                                                             <th class="border-bottom-0">رقم الدفعية</th>
                                                             <th class="border-bottom-0">الشهر</th>
 															<th class="border-bottom-0">الصورة</th>
+                                                            <th class="border-bottom-0">قيمة الكفالة</th>
                                                             <th class="border-bottom-0">المستند</th>
                                                         </tr>
                                                     </thead>
@@ -66,6 +67,7 @@
                                                             <tr>
 															   <td>{{$payment->id}}</td>
                                                                <td>{{ date( 'M j Y', strtotime($payment->created_at)) }}</td>
+                                                               <td>{{number_format($payment->sponserform->amount)}}</td>
                                                                 <td>
                                                                 @if ($payment->stauts == 0)
                                                                  <span class="text-danger">لم يتم التأكيد</span>

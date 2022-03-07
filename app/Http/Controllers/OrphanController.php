@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Orphan;
 use App\Models\Sponsor;
+use App\Models\Sponserform;
+use App\Models\Guardian;
 use App\Http\Requests\StoreOrphanRequest;
 use App\Http\Requests\UpdateOrphanRequest;
 use Spatie\Permission\Models\Role;
@@ -30,23 +32,27 @@ class OrphanController extends Controller
     {
        
         $user_id = Auth::user()->id;
-        dd( $user_id);
+        
         if (Auth::user()->user_type == 'admin')
+        {
+            $orphans = Orphan::all(); 
+        }
+        if (Auth::user()->user_type == 'user')
         {
             $orphans = Orphan::all(); 
         }
         elseif (Auth::user()->user_type == 'sponsor')
         { 
-            $orphans = Orphan::where('user_id',Auth::user()->id)->get();
+            $orphans = Orphan::where('user_id',$user_id)->get();
         }
         elseif (Auth::user()->user_type == 'guardian')
         {
-            
-            $orphans = Orphan::where('user_id',Auth::user()->id)->get();
+            $orphans = Orphan::where('stauts', '0')->get(); 
         }
         
-       dd($orphans);
         return view ('orphans.index',compact('orphans'));
+
+        
     }
 
     public function create()
@@ -213,6 +219,27 @@ class OrphanController extends Controller
         session()->flash('delete_orphan');
         return back();
     }
+
+    public function report(Request $request)
+    {
+       
+        if ($request->type = 1)
+        {
+            
+            $orphans = Orphan::where('stauts',1)->get();
+        }
+        elseif ($request->type = 2)
+        {
+            $orphans = Orphan::where('stauts',0)->get();
+        }
+        else
+        {
+            $orphans = Orphan::all(); 
+        }
+
+        return view ('orphans.report',compact('orphans'));
+
+    }//end of report
 
     public function get_file($id)
 

@@ -6,7 +6,10 @@
     <link href="{{ URL::asset('assets/plugins/jqvmap/jqvmap.min.css') }}" rel="stylesheet">
 @endsection
 
-<title>الرئيسية</title>
+@section('title')
+      الرئيسية
+@stop
+
 @section('page-header')
     <!-- breadcrumb -->
     <div class="breadcrumb-header justify-content-between">
@@ -14,6 +17,18 @@
             <div>
                 <h2 class="main-content-title tx-24 mg-b-1 mg-b-lg-1">مرحباً بك {{ Auth::user()->name }}</h2>
 
+            </div>
+        </div>
+         <div class="main-dashboard-header-right">
+            <div>
+                 @can('isGuardian')
+                <label class="tx-13">Online Sales</label>
+                <h5>0000</h5><br>
+                 @endcan
+                 @can('isSponsor')
+                 <label class="tx-13">Online Sales</label>
+                <h5>563,275</h5>
+                 @endcan
             </div>
         </div>
     </div>
